@@ -30,13 +30,8 @@ service = service_builder(tokenizer())
 ########################################################################
 
 """------------------------------------------------------------------------------------------------------------------------------"""
-
-import os 
+ 
 import io
-
-### google api imports #################################################
-
-from googleapiclient.http import MediaDownloadProgress,MediaFileUpload
 
 ### local imports ######################################################
 
@@ -44,11 +39,51 @@ from modules.__helper__.mimetypes import mimetype
 
 ########################################################################
 
+### request functions
 
-def ls(**kwargs) -> list[dict]:
-    request = (
-        service.files()
-        .list(**kwargs)
-        .execute()
-    )
-    return request
+class requests:
+
+    @httperrors
+    def ls(**kwargs) -> list[dict]:
+        """ls is function that request the list in files using api and return the result"""
+        request = (
+            service.files()
+            .list(**kwargs)
+            .execute()
+        )
+        return request
+
+    @httperrors
+    def create(**kwargs) -> list[dict]:
+        """create is function that request to create a folder/file in the drive using api """
+        request = (
+            service.files()
+            .create(**kwargs)
+            .execute()
+        )
+        return request
+
+    @httperrors
+    def get(**kwargs) -> list[dict]:
+        """get is function that request to get file/folder info in the drive using api"""
+        request = (
+            service.files()
+            .get(**kwargs)
+            .execute()
+        )
+        return request 
+
+    @httperrors
+    def update(**kwargs) -> list[dict]:
+        """update is function that request to update the meta-data in the drive using api"""
+        request = (
+            service.files()
+            .update(**kwargs)
+            .execute()
+        )
+        return request
+
+    @httperrors
+    def get_media(**kwargs) :
+        """get_media is function that request the dow"""
+        service.files().get_media()
