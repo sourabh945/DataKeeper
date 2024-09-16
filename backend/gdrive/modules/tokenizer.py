@@ -16,6 +16,13 @@ from __scopes__ import SCOPE
 
 #########################################################
 
+def make_folder():
+
+    if not os.path.isdir(os.path.sep(token_path)):
+        os.mkdir(os.path.sep(token_path))
+
+make_folder()
+
 def tokenizer() -> Credentials:
 
     token = None
