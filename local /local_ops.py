@@ -3,7 +3,7 @@ import os
 import datetime
 
 
-class local_ops:
+class local:
 
     def ls(local_folder:str) -> list[dict]:
         """ls is function get the recursive list of the given folder """
