@@ -51,7 +51,7 @@ def load_token() -> Credentials:
         token['rapt_token'] = half_token.get('rapt_token')
         token['trust_boundary'] = half_token.get('trust_boundary')
         token['universe_domain'] = half_token.get('universe_domain')
-        token['account'] = half_token.get('account','')
+        token['account'] = half_token.get('account')
 
         return Credentials.from_authorized_user_file(token,SCOPE)
 

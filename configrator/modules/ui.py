@@ -37,7 +37,7 @@ def initizer_ui() -> dict[dict]:
     print("Now the login open the browser and past the link( or it will happend automatically). And login with the gmail and password to give the permission to access the google drive.")
     print("Fell free to do this i the token is stored in the your computer in this current directory as in a hidden folder tokens/.\n")
 
-    token = tokenizer() # create the token 
+    token = True if tokenizer() else False # create the token 
 
     if token:
 
