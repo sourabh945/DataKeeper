@@ -1,10 +1,11 @@
 
 import os 
+import json
 
 ### google api imports ######################################
 
 from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
+from google.oauth2.credentials import Credentials , _GOOGLE_OAUTH2_TOKEN_ENDPOINT
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 
@@ -15,6 +16,9 @@ from .._secrets_ import gdrive_api_key
 from ..__scopes__ import SCOPE
 from .error import error
 
+########################################################
+
+
 #########################################################
 
 def make_folder():
@@ -24,6 +28,39 @@ def make_folder():
 
 make_folder()
 
+##########################################################
+
+def load_token() -> Credentials:
+
+    with open(token_path,'r') as file:
+        half_token = json.load(file)
+
+    token = {}
+
+    try:
+
+        token['token'] = half_token['token']
+        token['refresh_token'] = half_token['refresh_token']
+        token['token_uri'] = _GOOGLE_OAUTH2_TOKEN_ENDPOINT
+
+        token['client_id'] = gdrive_api_key['client_id']
+        token['client_secret'] = gdrive_api_key['client_secret']
+
+        token['quota_project_id'] = gdrive_api_key.get('quota_project_id')
+        token['expiry'] = half_token['expiry']
+        token['rapt_token'] = half_token.get('rapt_token')
+        token['trust_boundary'] = half_token.get('trust_boundary')
+        token['universe_domain'] = half_token.get('universe_domain')
+        token['account'] = half_token.get('account','')
+
+        return Credentials.from_authorized_user_file(token,SCOPE)
+
+    except Exception as err:
+
+        error(err,exit_=True)
+
+##########################################################
+
 def tokenizer() -> Credentials:
     
     try:
@@ -31,7 +68,8 @@ def tokenizer() -> Credentials:
         token = None
 
         if os.path.exists(token_path):
-            token = Credentials.from_authorized_user_file(token_path)
+    
+            token = load_token()
 
             
         if not token or not token.valid:
@@ -40,8 +78,14 @@ def tokenizer() -> Credentials:
             else:
                 flow = InstalledAppFlow.from_client_config(gdrive_api_key,SCOPE)
                 token = flow.run_local_server(port=0)
+
+            written_token = json.loads(token.to_json())
+
+            written_token['client_id'] = "***encrpyted***"
+            written_token['client_secret'] = "***encrpyted***"
+
             with open(token_path,'w') as file:
-                file.write(token.to_json())
+                json.dump(written_token,file)
 
         return token
     

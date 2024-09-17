@@ -1,3 +1,3 @@
 
-from backend.gdrive import remote
+from ..backend import remote
 

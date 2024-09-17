@@ -3,10 +3,8 @@ import os
 
 ### local imports ##################################
 
-from backend.gdrive import tokenizer
-from ...paths import token_path
-from .__helper__.hide_folder import hide_folder
-
+from ...backend import tokenizer
+from .error import error
 
 
 ######################################################
@@ -29,22 +27,31 @@ def initizer_ui() -> dict[dict]:
         else:
             print("Please select a valid folder.")
 
+    if local_folder[-1] != '/':
+        local_folder += "/"
+
     print('folder selected.')
 
+    """ there i have to add to select between different drive when i make the  backend for them"""
+
     print("Now the login open the browser and past the link( or it will happend automatically). And login with the gmail and password to give the permission to access the google drive.")
-    print("Fell free to do this i the token is stored in the your computer in this current directory as in folder tokens/.\n")
+    print("Fell free to do this i the token is stored in the your computer in this current directory as in a hidden folder tokens/.\n")
 
-    if not os.path.isdir(os.path.dirname(token_path)):
-        os.mkdir(os.path.dirname(token_path))
-
-    token = tokenizer()
-
-    hide_folder(os.path.dirname(token_path))
-
+    token = tokenizer() # create the token 
 
     if token:
 
         print('\nSuccessfully logged in.\n')
+
+    else:
+
+        error("\nUnsuccessful login.\n")
+    
+
+    return local_folder,token
+
+
+
 
 
     
