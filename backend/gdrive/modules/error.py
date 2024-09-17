@@ -18,6 +18,7 @@ def error(message:str,exit_:bool=False,code:int=1) -> None:
         code (int, optional): The exit code to use if exit_ is True. Defaults to 1.
     """
     print(f'[ Error ] {message}')
+    print(f'\nPlease raise issue to this https://github.com/sourabh945/bizbackup-clt/issues if unable to resolve the issue.')
     if exit_:
         exit(code)
 

@@ -1,1 +1,1 @@
-from .local_ops import local 
+from commands import local

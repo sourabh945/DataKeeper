@@ -9,8 +9,8 @@ from googleapiclient.errors import HttpError
 
     ######### local imports #############################
 
-from modules.tokenizer import tokenizer
-from modules.error import error,httperrors
+from .tokenizer import tokenizer
+from .error import error,httperrors
 
     ####################################################
 
@@ -43,7 +43,7 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 ### local imports ######################################################
 
-from modules.__helper__.mimetypes import mimetype
+from .__helper__.mimetypes import mimetype
 
 ########################################################################
 

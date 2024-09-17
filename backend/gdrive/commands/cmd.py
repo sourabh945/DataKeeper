@@ -3,8 +3,8 @@ import io
 
 ### from local modules import ################################
 
-from modules.request import requests
-from modules.error import is_exists, error, is_possible
+from ..modules.request import requests
+from ..modules.error import is_exists, error, is_possible
 
 ###########################################################
 
@@ -18,7 +18,8 @@ class remote:
             list[dict]: A list of dictionaries, each representing a file's metadata.
                          Returns an empty list if there are no files or an error occurs.
         """
-        return requests.ls(q='trashed=false', field='files(id,parent,drive_id,name,modtime,size,mimeType,properties)').get('files')
+        return (requests.ls(q='trashed=false', fields='files(id,parents,drive_id,name,modifiedTime,size,mimeType,properties)')).get('files', [])
+
 
     def create_folder(name: str, parents: str) -> str:
         """
@@ -38,7 +39,7 @@ class remote:
             'parents': [parents]
         }
 
-        return requests.create(body=metadata, field='id').get('id')
+        return requests.create(body=metadata, fields='id').get('id')
 
     @is_exists
     def upload_file(path: str, metadata: dict, resumable: bool = False) -> str:
@@ -56,7 +57,7 @@ class remote:
 
         file = MediaFileUpload(path, resumable=resumable)
 
-        return requests.create(body=metadata, media_body=file, field='id').get('id')
+        return requests.create(body=metadata, media_body=file, fields='id').get('id')
 
     @is_exists
     def create_and_upload(path: str, metadata: dict, resumable: bool = False) -> str:
@@ -75,14 +76,14 @@ class remote:
             str: The ID of the created and uploaded file on Google Drive, or None if the process fails.
         """
 
-        id = requests.generateId(field='id').get('id') or None
+        id = requests.generateId(fields='id').get('id') or None
 
         if id:
             metadata['id'] = id
 
             file = MediaFileUpload(path, resumable=resumable)
 
-            return requests.create(body=metadata, media_body=file, field='id').get('id')
+            return requests.create(body=metadata, media_body=file, fields='id').get('id')
 
     def update(id: str, metadata: str) -> bool:
         """
@@ -112,7 +113,7 @@ class remote:
         Returns:
             dict: A dictionary containing the metadata of the file or folder.
         """
-        return requests.get(fileId=id, field='files(id,parent,drive_id,name,modtime,size,mimeType,properties)').get('files')
+        return requests.get(fileId=id, fields='files(id,parents,drive_id,name,modtime,size,mimeType,properties)').get('files')
 
     @is_possible
     def download(id: str, path: str) -> bool:
