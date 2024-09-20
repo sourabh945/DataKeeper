@@ -1,9 +1,7 @@
-base_path = "./backend/gdrive"
+config_name = 'default'
 
-token_path = "./config/tokens/token.json"
+token_path = f"./config/{config_name}/token.json"
 
-local_folder = './backups/'
+connfig_path = f"./config/{config_name}/config.json"
 
-local_tree = './tree.json'
-
-config_path = './config/config.json'
+tree_path = f"./config/{config_name}/tree.json"

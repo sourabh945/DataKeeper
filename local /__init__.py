@@ -1,1 +1,1 @@
-from commands import local
+from .cmd import local
