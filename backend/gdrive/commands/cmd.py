@@ -18,7 +18,7 @@ class remote:
             list[dict]: A list of dictionaries, each representing a file's metadata.
                          Returns an empty list if there are no files or an error occurs.
         """
-        return (requests.ls(q='trashed=false', fields='files(id,parents,drive_id,name,modifiedTime,size,mimeType,properties)')).get('files', [])
+        return (requests.ls(q='trashed=false',spaces='drive', fields='files(id,parents,drive_id,name,modifiedTime,size,mimeType,properties)')).get('files', [])
 
     def root_id() -> str:
         """

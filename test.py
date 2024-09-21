@@ -1,25 +1,18 @@
 from backend import remote
 import json
 
+from worker.cmd.indexer import operations
+
 from backend.gdrive.modules import requests
 
-# result = (requests.ls(q='trashed=false',fields='files(id,name,parents)').get('files',[]))
+# a = remote.ls()
 
-# print(
-#     '\n'
-# # )
+# for i in a :
+#     print(i)
 
-# print(remote.ls())
-
-# # print(requests.get(fileId='root',fields='id'))
-
-
-from local import local
-
-result = local.ls('./')
-
-print('hello \n')
+a = operations.locals.indexer('./')
+with open('tests/data/response_local.json','w') as file:
+    json.dump(a,file)
 
 
-with open('tests/data/response.json','w') as file:
-    json.dump(result,file)
+print(a['.']['content'].keys())
