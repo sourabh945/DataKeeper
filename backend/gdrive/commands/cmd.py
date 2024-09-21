@@ -20,6 +20,16 @@ class remote:
         """
         return (requests.ls(q='trashed=false', fields='files(id,parents,drive_id,name,modifiedTime,size,mimeType,properties)')).get('files', [])
 
+    def root_id() -> str:
+        """
+        Retrieves the ID of the root folder in Google Drive.
+
+        Returns:
+            str: The ID of the root folder.
+        """
+        return requests.get(fileId='root', fields='id').get('id')
+
+
 
     def create_folder(name: str, parents: str) -> str:
         """
@@ -143,3 +153,5 @@ class remote:
                 return False
         else:
             return False
+
+

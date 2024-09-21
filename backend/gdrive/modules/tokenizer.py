@@ -53,7 +53,7 @@ def load_token() -> Credentials:
         token['universe_domain'] = half_token.get('universe_domain')
         token['account'] = half_token.get('account')
 
-        return Credentials.from_authorized_user_file(token,SCOPE)
+        return Credentials.from_authorized_user_info(token,SCOPE)
 
     except Exception as err:
 
@@ -76,7 +76,7 @@ def tokenizer() -> Credentials:
             if token and token.expired and token.refresh_token:
                 token.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_config(gdrive_api_key,SCOPE)
+                flow = InstalledAppFlow.from_cliprint(gdrive_api_key,SCOPE)
                 token = flow.run_local_server(port=0)
 
             written_token = json.loads(token.to_json())

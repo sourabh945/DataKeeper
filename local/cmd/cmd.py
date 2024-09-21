@@ -11,7 +11,7 @@ from paths import local_tree
 
 class local :
 
-    def ls(local_folder:str) -> list[dict]:
+    def ls_files(local_folder:str) -> list[dict]:
         """ls is function get the recursive list of the given folder """
         files_data = []
         for foldername, _, filenames in os.walk(local_folder):
@@ -37,7 +37,27 @@ class local :
                     'modtime': last_modified_iso 
                 })
         return files_data
-     
+    
+    def ls_folders(local_folder:str) -> list[dict]:
+        """ls is function get the recursive list of the given folder """
+        folders_data = []
+        for foldername, _, filenames in os.walk(local_folder):
+            relative_path = os.path.relpath(foldername, local_folder)
+            folders_data.append({
+                'name': os.path.basename(foldername),
+                'path': relative_path
+            })
+        return folders_data
+
+    def ls(local_folder:str) -> list[dict]:
+        """ls is function get the recursive list of the given folder """
+        folders_data = local.ls_folders(local_folder)
+        files_data = local.ls_files(local_folder)
+        return folders_data + files_data
+
+    def get_tree(local_folder:str) -> list[dict]:
+        """get_tree is function get the recursive list of the given folder """
+        return local.ls(local_folder)   
 
     def load_tree():
         if os.path.isfile(local_tree):
