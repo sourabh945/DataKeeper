@@ -62,7 +62,7 @@ def is_exists(func):
     """
     @wraps(func)
     def wrapper(*args,**kwargs):
-        file_path = kwargs['file_path']
+        file_path = kwargs.get('path') or args[0]
         if os.path.isfile(file_path):
             return func(*args,**kwargs)
         else:
