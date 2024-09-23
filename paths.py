@@ -6,4 +6,3 @@ connfig_path = f"./config/{config_name}/config.json"
 
 tree_path = f"./config/{config_name}/tree.json"
 
-local_tree = " "
