@@ -67,6 +67,8 @@ def upload(folders:list,files:list,modified_files:list):
 
     print('[Creating] Folders...')
 
+    print(folders)
+
     _new_folders = run(remote.functions._create_folder,folders)
     
     print('[Done] Creating folders...')
@@ -105,6 +107,8 @@ if __name__ == '__main__':
 
     local_folders, local_files = local_ls(folder_path,tree)
 
+    
+
     lists = remote.ls()
 
     remote_dict = remote_list_2_dict(lists)
@@ -114,6 +118,12 @@ if __name__ == '__main__':
     if not _folder_id:
 
         _folder_id = remote.create_folder(os.path.basename(folder_path),ROOT_ID)
+
+        print(os.path.basename(folder_path),_folder_id,folder_path)
+
+        lists = remote.ls()
+
+        remote_dict = remote_list_2_dict(lists)
 
     remote_folders, remote_files = remote_ls(remote_dict,_folder_id,folder_path)
 
@@ -133,7 +143,18 @@ if __name__ == '__main__':
 
     print(f"Comparing local and remote files...")
 
-    new_folders, new_file , deleted_folders , deleted_files , modified_files = compare(local_folders,remote_folders,local_files,remote_files)
+    # # ""
+    # for i in local_folders:
+    #     print(i,local_folders[i])
+
+    # print("\n\n")
+
+    # for i in local_files:
+    #     print(i,local_files[i])
+
+    # # ""
+
+    new_folders, new_file , deleted_folders , deleted_files , modified_files = compare(folder_path,[local_folders,local_files],[remote_folders,remote_files])
 
     print('[Done] Comparing')
 
@@ -150,6 +171,14 @@ if __name__ == '__main__':
 
     print("-------------------------------------------------------------------\n")
 
+    if (len(new_file)+len(new_folders)+len(modified_files)) == 0:
+
+        print('Every thing is up to date ')
+
+        write_tree(local_folder,local_files,tree_path)
+
+        exit(0)
+
     print('Choose the operation :\n')
 
     print("[1] For upload only")
@@ -163,7 +192,7 @@ if __name__ == '__main__':
         print("choose the correct option. \n")
         option = int(input("> "))
 
-    if option == 1:
+    if option == 1 and len(new_file)+len(new_folders)+len(modified_files) > 0 :
 
         upload(new_folders,new_file,modified_files)
 
@@ -174,7 +203,7 @@ if __name__ == '__main__':
         print('[Done] writting')
 
 
-    elif option == 2:
+    elif option == 2 and len(deleted_folders)+len(deleted_files) > 0:
 
         donwloads(deleted_folders,deleted_files)
 
@@ -193,7 +222,9 @@ if __name__ == '__main__':
 
     elif option == 4:
 
-        pass
+        print('Cancelling every thing')
+
+        exit(0)
 
     
 

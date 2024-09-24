@@ -40,13 +40,15 @@ def compare(backup_folder_path:str,local_:list[dict],remote_:list[dict]) -> list
         new_files , new_folders , deleted_files , deleted_folders , modified_files = [],[],[],[],[]
 
         local_content = local_folders.get(folder,{}).get('content',[])
+
         remote_content = set(remote_folders.get(folder,{}).get('content',[]))
+
 
         for name in local_content:
 
             path = os.path.join(folder,name)
 
-            if local_folders[path]['isdir']:
+            if local_folders.get(path,{}).get('isdir',False):
                 
                 if name not in remote_content:
                     

@@ -59,6 +59,8 @@ def create_config():
             else:
                 print('\nPlease enter the path of a valid folder')
 
+        folder = folder.rsplit('/')[0]
+
         with open(os.path.join(CONFIG_PATH,name,'config.json'),'w') as file:
             json.dump({'backup_folder':folder},file)
 
