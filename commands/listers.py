@@ -1,8 +1,8 @@
 
 import os 
 
-from __helpers__.time import get_modtime
-from __helpers__.trying import get_size
+from .__helpers__.time import get_modtime
+from .__helpers__.trying import get_size
 
 def folder_id_in_root(remote_dict:dict,foldername:str,root_id:str) -> str:
 

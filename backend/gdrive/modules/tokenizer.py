@@ -43,10 +43,11 @@ def load_token() -> Credentials:
         token['refresh_token'] = half_token['refresh_token']
         token['token_uri'] = _GOOGLE_OAUTH2_TOKEN_ENDPOINT
 
-        token['client_id'] = gdrive_api_key['client_id']
-        token['client_secret'] = gdrive_api_key['client_secret']
+        token['client_id'] = gdrive_api_key['installed']['client_id']
+        token['client_secret'] = gdrive_api_key['installed']['client_secret']
 
-        token['quota_project_id'] = gdrive_api_key.get('quota_project_id')
+        token['quota_project_id'] = gdrive_api_key['installed'].get('quota_project_id')
+        
         token['expiry'] = half_token['expiry']
         token['rapt_token'] = half_token.get('rapt_token')
         token['trust_boundary'] = half_token.get('trust_boundary')

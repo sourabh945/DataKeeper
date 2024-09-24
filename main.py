@@ -105,7 +105,7 @@ if __name__ == '__main__':
 
     local_folders, local_files = local_ls(folder_path,tree)
 
-    lists = remote_ls()
+    lists = remote.ls()
 
     remote_dict = remote_list_2_dict(lists)
 

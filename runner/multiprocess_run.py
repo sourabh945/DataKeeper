@@ -1,7 +1,7 @@
 import multiprocessing as mp 
 import queue
 
-NUM_PROCESSES = 2*mp.cpu_count + 1
+NUM_PROCESSES = 2*(mp.cpu_count()) + 1
 
 def run(func:callable,item_list:list) -> dict:
 

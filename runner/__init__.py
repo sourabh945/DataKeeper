@@ -1,1 +1,1 @@
-from multiprocess_run import run
+from .multiprocess_run import run
