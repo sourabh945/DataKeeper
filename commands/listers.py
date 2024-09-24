@@ -15,6 +15,8 @@ def local_ls(path:str,tree:dict[dict]={}) -> list[dict]:
         tree (dict[dict], optional): The tree of the files and folders. Defaults to {}.
 
     Returns:
+        folders_ , files_
+
         list[dict]: A list of dictionaries containing the files and folders.
     """
 

@@ -71,6 +71,9 @@ def tokenizer() -> Credentials:
     
             token = load_token()
 
+        else:
+            print("\nPlease login the to with using gmail account where you wanted to backup the folder. And don't worry about thing all the access tokens are store locally no one can use it.")
+
             
         if not token or not token.valid:
             if token and token.expired and token.refresh_token:

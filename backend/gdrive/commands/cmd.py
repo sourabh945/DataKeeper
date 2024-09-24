@@ -1,5 +1,8 @@
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import io
+import os
+import queue
+
 
 ### from local modules import ################################
 
@@ -9,7 +12,9 @@ from ..modules.error import is_exists, error, is_possible
 ###########################################################
 
 class remote:
-
+    """
+    Provides methods for interacting with a remote Google Drive storage.
+    """
     def ls() -> list[dict]:
         """
         Retrieves a list of files from Google Drive.
@@ -49,7 +54,7 @@ class remote:
             'parents': [parents]
         }
 
-        return requests.create(body=metadata, fields='id').get('id')
+        return requests.create(body=metadata, fields='id').get('id') or None
 
     @is_exists
     def upload_file(path: str, metadata: dict, resumable: bool = False) -> str:
@@ -154,4 +159,168 @@ class remote:
         else:
             return False
 
+    #############################################################################################33
+    class functions:
+        """
+        Provides asynchronous functions for file operations.
+        """
+        def _create_folder(item:dict,q:queue.Queue):
+            """
+            Creates a folder asynchronously.
 
+            Args:
+                item (dict): A dictionary containing folder information.
+                q (queue.Queue): A queue to put the result in.
+            """
+            print(f'[ Creating ] folder: {item["path"]}')
+
+            res = remote.create_folder(os.path.basename(item['path']),item['parents'])
+
+            if res:
+
+                print(f'[ Done ] folder: {item["path"]}')
+
+                q.put((item['path'],res))
+
+            else:
+
+                print(f'[ Fail ] folder: {item["path"]}')
+
+                q.put((item['path'],res))
+
+
+        def _upload_file(item:dict,q:queue.Queue):
+            """
+            Uploads a file asynchronously.
+
+            Args:
+                item (dict): A dictionary containing file information.
+                q (queue.Queue): A queue to put the result in.
+            """
+            print(f'[ Uploading ] file: {item["path"]}')
+
+            metadata = {
+                'name': os.path.basename(item['path']),
+                'parents': item['parents'],
+                'properties': {
+                    'version':item['version'],
+                    'other_version':item['other_version']
+                    },
+                'description':f'version:{item['version']} | local_path:{item["path"]}',
+                'modifiedTime':item['modtime']
+            }
+
+            resumable = True if item['size']/(1024*1024) > 5 else False
+            
+            res = remote.upload_file(item['path'],metadata,resumable)
+
+            if res:
+
+                print(f'[ Done ] file: {item["path"]}')
+
+                q.put((item['path'],res))
+
+            else:
+
+                print(f'[ Fail ] file: {item["path"]}')
+
+                q.put((item['path'],res))
+
+
+        def _update_file(item:dict,q:queue.Queue):
+            """
+            Updates a file asynchronously.
+
+            Args:
+                item (dict): A dictionary containing file information.
+                q (queue.Queue): A queue to put the result in.
+            """
+            print(f'[ Updating ] file: {item["path"]}')
+
+            metadata = {
+                'properties': {
+                    'version':item['version'],
+                    'other_version':item['other_version']
+                    },
+                'description':f'version:{item['version']} | local_path:{item["path"]}',
+                'modifiedTime':item['modtime']
+            }
+
+            res = remote.update(item['id'],metadata)
+
+            if res:
+
+                print(f'[ Done ] file: {item["path"]}')
+
+                q.put((item['path'],res))
+
+            else:
+
+                print(f'[ Fail ] file: {item["path"]}')
+
+                q.put((item['path'],res))
+
+
+
+        def _create_and_upload_file(item:dict,q:queue.Queue):
+            """
+            Creates and uploads a file asynchronously.
+
+            Args:
+                item (dict): A dictionary containing file information.
+                q (queue.Queue): A queue to put the result in.
+            """
+            print(f'[ Creating and Uploading ] file: {item["path"]}')
+
+            metadata = {
+                'name': os.path.basename(item['path']),
+                'parents': item['parents'],
+                'properties': {
+                    'version':item['version'],
+                    'other_version':item['other_version']
+                    },
+                'description':f'version:{item['version']} | local_path:{item["path"]}',
+                'modifiedTime':item['modtime']
+            }
+
+            resumable = True if item['size']/(1024*1024) > 5 else False
+            
+            res = remote.create_and_upload(item['path'],metadata,resumable)
+
+            if res:
+
+                print(f'[ Done ] file: {item["path"]}')
+
+                q.put((item['path'],res))
+
+            else:
+
+                print(f'[ Fail ] file: {item["path"]}')
+
+                q.put((item['path'],res))
+
+
+
+        def _download_file(item:dict,q:queue.Queue):
+            """
+            Downloads a file asynchronously.
+
+            Args:
+                item (dict): A dictionary containing file information.
+                q (queue.Queue): A queue to put the result in.
+            """
+            print(f'[ Downloading ] file: {item["path"]}')
+
+            res = remote.download(item['id'],item['path'])
+
+            if res:
+
+                print(f'[ Done ] file: {item["path"]}')
+
+                q.put((item['path'],res))
+
+            else:
+
+                print(f'[ Fail ] file: {item["path"]}')
+
+                q.put((item['path'],res))
