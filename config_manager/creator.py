@@ -1,10 +1,10 @@
 import os
 import re
 import json
-from ..backend import tokenizer
 
-from __helper__.hide_folder import hide_folder
-from __helper__.error import error
+
+from .__helper__.hide_folder import hide_folder
+from .__helper__.error import error
 
 CONFIG_PATH = './config/'
 
@@ -29,23 +29,23 @@ def create_config():
     try:
         if not os.path.isdir(CONFIG_PATH):
             os.mkdir(CONFIG_PATH)
-            hide_folder(CONFIG_PATH)
+        hide_folder(CONFIG_PATH)
 
         print('Hello !!!\n')
         print("Please enter a name for the configuration:\n")
 
         while True:
             name = input('> ')
-            if is_valid_folder_name(name):
+            if is_valid_folder_name(name) and not os.path.isdir(os.path.join(CONFIG_PATH, name)):
                 break
             else:
                 print("Invalid folder name. Please use only letters, numbers, spaces, underscores, or hyphens.")
+                print("And this folder might be already exits so try another name.")
 
         print(f'\nOkay, creating a hidden folder for this configuration: {name}')
 
         try:
             os.mkdir(os.path.join(CONFIG_PATH, name))  # Safer path joining
-            hide_folder(os.path.join(CONFIG_PATH, name))
         except OSError as e:
             error(f"Error creating folder: {e}")
             # Handle the error appropriately (e.g., log it, exit the program)
@@ -59,8 +59,8 @@ def create_config():
             else:
                 print('\nPlease enter the path of a valid folder')
 
-        with open(os.path.join(name,'config.json'),'w') as file:
-            json.dump({'backup_folder':folder})
+        with open(os.path.join(CONFIG_PATH,name,'config.json'),'w') as file:
+            json.dump({'backup_folder':folder},file)
 
         return name,folder
 

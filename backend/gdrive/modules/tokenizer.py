@@ -79,7 +79,7 @@ def tokenizer() -> Credentials:
             if token and token.expired and token.refresh_token:
                 token.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_cliprint(gdrive_api_key,SCOPE)
+                flow = InstalledAppFlow.from_client_config(gdrive_api_key,scopes=SCOPE)
                 token = flow.run_local_server(port=0)
 
             written_token = json.loads(token.to_json())

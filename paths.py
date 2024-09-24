@@ -2,12 +2,13 @@ from config_manager import load_config , create_config
 
 import os 
 
-CONFIG_PATH = './config'
+CONFIG_PATH = './config/'
 
 if os.path.isdir(CONFIG_PATH):
-    config_name  , folder_path = load_config()
+    try:
+        config_name  , folder_path = load_config()
 
-    if config_name is None:
+    except:
         config_name , folder_path = create_config()
 else:
     config_name, folder_path = create_config()

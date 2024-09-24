@@ -3,7 +3,7 @@ import os
 import json
 
 
-from __helper__.error import error
+from .__helper__.error import error
 
 
 CONFIG_PATH = './config/'
@@ -13,19 +13,19 @@ def load_config() -> list[str,str]:
 
     try:
 
-        configs = os.path.listdir(CONFIG_PATH)
+        configs = os.listdir(CONFIG_PATH)
 
         if configs:
 
             print("Choose the configuration which are you using and enter 0 for making new configuration : \n")
 
-            for i in configs:
+            for i,name in enumerate(configs):
 
-                print(f'[{i+1}] {configs[i]}')
+                print(f'[{i+1}] {name}')
 
             config_index = int(input("> "))
 
-            while config_index > len(config_index) or config_index < 0:
+            while config_index > len(configs) or config_index < 0:
                 print("Please enter a valid number.")
                 config_index = int(input("> "))
             
@@ -37,7 +37,7 @@ def load_config() -> list[str,str]:
 
                 try:
 
-                    with open(os.path.join(configs[config_index-1],'config.json'),'r') as file:
+                    with open(os.path.join(CONFIG_PATH,configs[config_index-1],'config.json'),'r') as file:
                         folder = json.load(file)
 
                     return configs[config_index-1] , folder['backup_folder']
