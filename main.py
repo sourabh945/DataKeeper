@@ -10,7 +10,7 @@ from backend import tokenizer , remote
 
 print('[Done] access tokens')
 
-from commands import remote_list_2_dict, remote_ls , local_ls , write_tree , compare , load_tree
+from commands import remote_list_2_dict, remote_ls , local_ls , write_tree , compare , load_tree , folder_id_in_root
 
 from runner import run 
 
@@ -21,6 +21,47 @@ tree = {}
 
 local_folder , local_files , remote_folders , remote_files= {} , {} , {} , {}
 
+####################################################################################
+
+def donwloads(folders:dict,files:dict):
+
+    print('[Creating] Folder in locals...')
+
+    for item in folders:
+
+        if not os.path.isdir(item['path']):
+
+            os.mkdir(item['path'])
+
+    print('[Done] Creating.')
+
+    print('[Donwloading] files...')
+
+    run(remote.functions._download_file,files)
+
+    print('[Done] Donwloading.')
+
+
+def write_to_locals(folders:dict,files:dict,modified_files:dict):
+
+    print("[Processing] Files upload outputs ...")
+
+    for item in folders.keys():
+
+        local_folder[item]['id'] = folders[item]
+
+    for item in files.keys():
+
+        local_files[item]['id'] = files[item]
+
+    for item in modified_files.keys():
+
+        local_files[item]['id'] = modified_files[item]
+
+        local_files[item]['version'] += 1
+
+    print('[Done] processing.')
+
 
 def upload(folders:list,files:list,modified_files:list):
 
@@ -29,6 +70,27 @@ def upload(folders:list,files:list,modified_files:list):
     _new_folders = run(remote.functions._create_folder,folders)
     
     print('[Done] Creating folders...')
+
+    for item in files:
+        if os.path.dirname(item['path']) in _new_folders.keys():
+            item['parents'] = [_new_folders[os.path.dirname(item)]]
+
+    print('[Uploading] new_files ..,')
+
+    _new_files = run(remote.functions._upload_file,files)
+
+    print('[Done] uploading new files.')
+
+    print('[Uploading] modified files...')
+
+    _modified_files = run(remote.functions._upload_file,modified_files)
+
+    print('[Done] uploading modified files.')
+
+    write_to_locals(_new_folders,_new_files,_modified_files)
+
+    return _new_folders , _new_files , _modified_files
+
 
     
 
@@ -47,7 +109,13 @@ if __name__ == '__main__':
 
     remote_dict = remote_list_2_dict(lists)
 
-    remote_folders, remote_files = remote_ls(remote_dict,ROOT_ID)
+    _folder_id = folder_id_in_root(remote_dict,os.path.basename(folder_path),ROOT_ID)
+
+    if not _folder_id:
+
+        _folder_id = remote.create_folder(os.path.basename(folder_path),ROOT_ID)
+
+    remote_folders, remote_files = remote_ls(remote_dict,_folder_id,folder_path)
 
     print('[Done] Indexing')
 
@@ -94,4 +162,38 @@ if __name__ == '__main__':
     while option < 1 or option > 4:
         print("choose the correct option. \n")
         option = int(input("> "))
+
+    if option == 1:
+
+        upload(new_folders,new_file,modified_files)
+
+        print('[Writting] tree')
+
+        write_tree(local_folder,local_files,tree_path)
+
+        print('[Done] writting')
+
+
+    elif option == 2:
+
+        donwloads(deleted_folders,deleted_files)
+
+    elif option == 3:
+
+        upload(new_folders,new_file,modified_files)
+
+        donwloads(deleted_folders,deleted_files)
+
+        print('[Writting] tree')
+
+        write_tree(local_folder,local_files,tree_path)
+
+        print('[Done] writting')
+
+
+    elif option == 4:
+
+        pass
+
+    
 

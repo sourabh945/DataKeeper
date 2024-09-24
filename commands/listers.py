@@ -4,6 +4,16 @@ import os
 from __helpers__.time import get_modtime
 from __helpers__.trying import get_size
 
+def folder_id_in_root(remote_dict:dict,foldername:str,root_id:str) -> str:
+
+    for item in remote_dict:
+        if item == root_id:
+            if remote_dict[item]['name'] == foldername:
+                return item
+    return None
+
+    
+
 
 
 def local_ls(path:str,tree:dict[dict]={}) -> list[dict]:
