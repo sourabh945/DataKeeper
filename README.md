@@ -6,7 +6,7 @@ This is a program which use to backup the file to the google drive using google 
 
 And the executable are also presents that can be easy to use and it doesn't require any api client id and client secret. So download the api and use the application now.
 
-ubuntu: https://github.com/sourabh945/DataKeeper/tree/main/Executables/ubuntu/DataKeeper
+ubuntu: https://github.com/sourabh945/DataKeeper/tree/main/Executables/Ubuntu/DataKeeper
 
 -----------------------------------------------------------------------------------------
 
