@@ -54,7 +54,7 @@ def upload(tree:dict,upload_files:list):
 
     for item in upload_files:
        
-       if not item['parents'] :
+       if item['parents'] == [] or item['parents'] == [""]:
            
             item['parents'] = [ids.get(os.path.dirname(item['path']),"")]
 
