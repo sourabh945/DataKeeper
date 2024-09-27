@@ -29,7 +29,6 @@ def create_config():
     try:
         if not os.path.isdir(CONFIG_PATH):
             os.mkdir(CONFIG_PATH)
-        hide_folder(CONFIG_PATH)
 
         print('Hello !!!\n')
         print("Please enter a name for the configuration:\n")
@@ -58,8 +57,6 @@ def create_config():
                 break 
             else:
                 print('\nPlease enter the path of a valid folder')
-
-        folder = folder.rsplit('/')[0]
 
         with open(os.path.join(CONFIG_PATH,name,'config.json'),'w') as file:
             json.dump({'backup_folder':folder},file)
