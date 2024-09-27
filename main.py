@@ -10,9 +10,10 @@ from backend import tokenizer , remote
 
 print('[Done] access tokens')
 
-from commands import remote_list_2_dict, remote_ls , local_ls , write_tree , compare , load_tree , folder_id_in_root
+from commands import remote_ls , local_ls , remote_list_2_dict , find_folder_id_in_root as folder_id_find_in_root
 
-from runner import run 
+
+from runner import run ,async_run
 
 
 ## globals ##
@@ -42,59 +43,31 @@ def donwloads(folders:dict,files:dict):
     print('[Done] Donwloading.')
 
 
-def write_to_locals(folders:dict,files:dict,modified_files:dict):
+def upload(tree:dict,upload_files:list):
+   
+    fails = []
 
-    print("[Processing] Files upload outputs ...")
-
-    for item in folders.keys():
-
-        local_folder[item]['id'] = folders[item]
-
-    for item in files.keys():
-
-        local_files[item]['id'] = files[item]
-
-    for item in modified_files.keys():
-
-        local_files[item]['id'] = modified_files[item]
-
-        local_files[item]['version'] += 1
-
-    print('[Done] processing.')
+    print('\n[Creating] Folders...')
 
 
-def upload(folders:list,files:list,modified_files:list):
+    local__ , ids = async_run(remote.create_folder,tree)
 
-    print('[Creating] Folders...')
+    print('\n[Done] creating folders')
 
-    print(folders)
+    for item in upload_files:
+       
+       if not item['parents'] :
+           
+            item['parents'] = [ids.get(item['path'],[])]
 
-    _new_folders = run(remote.functions._create_folder,folders)
-    
-    print('[Done] Creating folders...')
+    print('\n[Uploading] files...')
 
-    for item in files:
-        if os.path.dirname(item['path']) in _new_folders.keys():
-            item['parents'] = [_new_folders[os.path.dirname(item)]]
+    results = run(remote.functions._upload_file,upload_files)
 
-    print('[Uploading] new_files ..,')
+    print('\n[Done] uploading files')
 
-    _new_files = run(remote.functions._upload_file,files)
+    return results, fails
 
-    print('[Done] uploading new files.')
-
-    print('[Uploading] modified files...')
-
-    _modified_files = run(remote.functions._upload_file,modified_files)
-
-    print('[Done] uploading modified files.')
-
-    write_to_locals(_new_folders,_new_files,_modified_files)
-
-    return _new_folders , _new_files , _modified_files
-
-
-    
 
 
 if __name__ == '__main__':
@@ -103,79 +76,74 @@ if __name__ == '__main__':
 
     ROOT_ID = remote.root_id()
 
-    tree = load_tree(tree_path)
-
-    local_folders, local_files = local_ls(folder_path,tree)
-
-    
-
     lists = remote.ls()
 
-    remote_dict = remote_list_2_dict(lists)
+    lists = remote_list_2_dict(lists)
 
-    _folder_id = folder_id_in_root(remote_dict,os.path.basename(folder_path),ROOT_ID)
+    backup_folder_id = folder_id_find_in_root(lists,ROOT_ID,os.path.basename(folder_path))
 
-    if not _folder_id:
 
-        _folder_id = remote.create_folder(os.path.basename(folder_path),ROOT_ID)
+    if not backup_folder_id:
 
-        print(os.path.basename(folder_path),_folder_id,folder_path)
+        backup_folder_id = remote.create_folder(os.path.basename(folder_path),ROOT_ID)
+
+        if not backup_folder_id:
+
+            print('Unable to create folders in remote')
+            
+            exit(1)
 
         lists = remote.ls()
 
-        remote_dict = remote_list_2_dict(lists)
+        lists = remote_list_2_dict(lists)
 
-    remote_folders, remote_files = remote_ls(remote_dict,_folder_id,folder_path)
+    
+
+    remote_folders , remote_files = remote_ls(lists,backup_folder_id,folder_path)
+
+    ################################################33
+
+    import json
+
+    with open(tree_path,'w') as files:
+
+        json.dump({**remote_folders,**remote_files},files)
+
+    ##################################################3
 
     print('[Done] Indexing')
+    print('[Comparing] Both sources...')
 
-    print('-------------------------------------------------------------------\n[Results]\n')
-
-    print(f"Total number of folder in local: {len(local_folders)}")
-    print(f"Total number of files in local: {len(local_files)}")
-
-    print(f"Total number of folder in remote: {len(remote_folders)}")
-    print(f"Total number of files in remote: {len(remote_files)}")
-
-    print('-------------------------------------------------------------------\n[Comparing]\n')
-
-    print(f"Comparing local and remote folders...")
-
-    print(f"Comparing local and remote files...")
-
-    # # ""
-    # for i in local_folders:
-    #     print(i,local_folders[i])
-
-    # print("\n\n")
-
-    # for i in local_files:
-    #     print(i,local_files[i])
-
-    # # ""
-
-    new_folders, new_file , deleted_folders , deleted_files , modified_files = compare(folder_path,[local_folders,local_files],[remote_folders,remote_files])
+    local_ , upload_files, deleted_folders , deleted_files , count_new_folders , count_new_files , count_modified_files ,total_folders,total_files= local_ls(folder_path,backup_folder_id,ROOT_ID,remote_folders,remote_files)
 
     print('[Done] Comparing')
 
     print('-------------------------------------------------------------------\n[Results]\n')
 
-    print(f"Total number of new folders: {len(new_folders)}")
-    print(f"Total number of new files: {len(new_file)}")
+    print(f"Total number of folder in local: {total_folders}")
+    print(f"Total number of files in local: {total_files}")
+
+    print(f"Total number of folder in remote: {len(remote_folders)}")
+    print(f"Total number of files in remote: {len(remote_files)}")
+
+    print('-------------------------------------------------------------------\n')
+
+    print(f"Total number of new folders: {count_new_folders}")
+    print(f"Total number of new files: {count_new_files}")
 
     print(f"Total number of deleted folders: {len(deleted_folders)}")
     print(f"Total number of deleted files: {len(deleted_files)}")
 
-    print(f"Total number of modified files: {len(modified_files)}")
+    print(f"Total number of modified files: {count_modified_files}")
+
+
 
 
     print("-------------------------------------------------------------------\n")
 
-    if (len(new_file)+len(new_folders)+len(modified_files)) == 0:
+    if sum([len(deleted_files),len(deleted_folders),count_modified_files,count_new_files,count_new_folders]) == 0:
 
         print('Every thing is up to date ')
-
-        write_tree(local_folder,local_files,tree_path)
 
         exit(0)
 
@@ -192,15 +160,18 @@ if __name__ == '__main__':
         print("choose the correct option. \n")
         option = int(input("> "))
 
-    if option == 1 and len(new_file)+len(new_folders)+len(modified_files) > 0 :
+    if option == 1 and sum([count_modified_files,count_new_files]) > 0 :
 
-        upload(new_folders,new_file,modified_files)
+        # print(upload_files)
 
-        print('[Writting] tree')
+        result , fail = upload(local_,upload_files)
 
-        write_tree(local_folder,local_files,tree_path)
+        for i in result:
 
-        print('[Done] writting')
+            if result[i]:
+                fail.append(i)
+
+        print(f'No. of fails:{len(fail)}')
 
 
     elif option == 2 and len(deleted_folders)+len(deleted_files) > 0:
@@ -209,15 +180,9 @@ if __name__ == '__main__':
 
     elif option == 3:
 
-        upload(new_folders,new_file,modified_files)
+        upload(local_,upload_files)
 
         donwloads(deleted_folders,deleted_files)
-
-        print('[Writting] tree')
-
-        write_tree(local_folder,local_files,tree_path)
-
-        print('[Done] writting')
 
 
     elif option == 4:

@@ -164,13 +164,42 @@ class remote:
         """
         Provides asynchronous functions for file operations.
         """
-        def _create_folder(item:dict,q:queue.Queue):
+
+
+        def _async_create_folder(item:dict,parent_id:str =""):
+            """
+            Creates a folder asynchronously.
+
+            Args:
+                item (dict): A dictionary containing folder information.
+                parent_id (str): The ID of the parent folder.
+            """
+            print(f'[ Creating ] folder: {item["path"]}')
+
+            res = remote.create_folder(os.path.basename(item['path']),parent_id)
+
+
+            if res:
+
+                print(f'[ Done ] folder: {item["path"]}')
+
+                return (item['path'],res)
+
+            else:
+
+                print(f'[ Fail ] folder: {item["path"]}')
+
+                return {item['path']:res}
+
+
+        def _create_folder(item:dict):
             """
             Creates a folder asynchronously.
 
             Args:
                 item (dict): A dictionary containing folder information.
                 q (queue.Queue): A queue to put the result in.
+                parent_id (str): The ID of the parent folder.
             """
             print(f'[ Creating ] folder: {item["path"]}')
 
@@ -181,33 +210,32 @@ class remote:
 
                 print(f'[ Done ] folder: {item["path"]}')
 
-                q.put((item['path'],res))
-
             else:
 
                 print(f'[ Fail ] folder: {item["path"]}')
 
-                q.put((item['path'],res))
+            return {item['path'],res}
 
 
-        def _upload_file(item:dict,q:queue.Queue):
+        def _upload_file(item:dict):
             """
             Uploads a file asynchronously.
 
             Args:
                 item (dict): A dictionary containing file information.
                 q (queue.Queue): A queue to put the result in.
+                parent_id (str): The ID of the parent folder.
             """
             print(f'[ Uploading ] file: {item["path"]}')
 
             metadata = {
                 'name': os.path.basename(item['path']),
-                'parents': item['parents'],
+                'parents':list(item['parents']),
                 'properties': {
                     'version':item['version'],
                     'other_version':item['other_version']
                     },
-                'description':f'version:{item['version']} | local_path:{item["path"]}',
+                'description':f'version:{item['version']} | local_path:{item["path"]} | other_version:{item["other_version"]}',
                 'modifiedTime':item['modtime']
             }
 
@@ -219,22 +247,23 @@ class remote:
 
                 print(f'[ Done ] file: {item["path"]}')
 
-                q.put((item['path'],res))
 
             else:
 
                 print(f'[ Fail ] file: {item["path"]}')
 
-                q.put((item['path'],res))
+            return {item['path'],res}
 
 
-        def _update_file(item:dict,q:queue.Queue):
+
+        def _update_file(item:dict):
             """
             Updates a file asynchronously.
 
             Args:
                 item (dict): A dictionary containing file information.
                 q (queue.Queue): A queue to put the result in.
+                parent_id (str): The ID of the parent folder.
             """
             print(f'[ Updating ] file: {item["path"]}')
 
@@ -253,29 +282,28 @@ class remote:
 
                 print(f'[ Done ] file: {item["path"]}')
 
-                q.put((item['path'],res))
-
             else:
 
                 print(f'[ Fail ] file: {item["path"]}')
 
-                q.put((item['path'],res))
+            return {item['path'],res}
 
 
 
-        def _create_and_upload_file(item:dict,q:queue.Queue):
+        def _create_and_upload_file(item:dict):
             """
             Creates and uploads a file asynchronously.
 
             Args:
                 item (dict): A dictionary containing file information.
                 q (queue.Queue): A queue to put the result in.
+                parent_id (str): The ID of the parent folder.
             """
             print(f'[ Creating and Uploading ] file: {item["path"]}')
 
             metadata = {
                 'name': os.path.basename(item['path']),
-                'parents': item['parents'],
+                'parents': list(item['parents']),
                 'properties': {
                     'version':item['version'],
                     'other_version':item['other_version']
@@ -292,23 +320,21 @@ class remote:
 
                 print(f'[ Done ] file: {item["path"]}')
 
-                q.put((item['path'],res))
-
             else:
 
                 print(f'[ Fail ] file: {item["path"]}')
 
-                q.put((item['path'],res))
+            return {item['path'],res}
 
 
-
-        def _download_file(item:dict,q:queue.Queue):
+        def _download_file(item:dict):
             """
             Downloads a file asynchronously.
 
             Args:
                 item (dict): A dictionary containing file information.
                 q (queue.Queue): A queue to put the result in.
+                parent_id (str): The ID of the parent folder.
             """
             print(f'[ Downloading ] file: {item["path"]}')
 
@@ -318,10 +344,9 @@ class remote:
 
                 print(f'[ Done ] file: {item["path"]}')
 
-                q.put((item['path'],res))
 
             else:
 
                 print(f'[ Fail ] file: {item["path"]}')
 
-                q.put((item['path'],res))
+            return {item['path'],res}

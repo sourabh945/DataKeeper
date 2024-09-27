@@ -14,6 +14,10 @@ else:
     config_name, folder_path = create_config()
 
 
+if folder_path[-1] == "/":
+    folder_path = folder_path[:-1]
+
+
 token_path = f"./config/{config_name}/token.json"
 
 connfig_path = f"./config/{config_name}/config.json"

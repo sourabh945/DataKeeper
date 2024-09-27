@@ -1,27 +1,26 @@
-import multiprocessing as mp 
+import multiprocessing 
 import queue
 
-NUM_PROCESSES = 2*(mp.cpu_count()) + 1
+def printl(item,q):
+    print(item)
+
+NUM_PROCESSES = 2*(multiprocessing.cpu_count()) + 1
 
 def run(func:callable,item_list:list) -> dict:
 
-    res = queue.Queue()
+    with multiprocessing.Pool(NUM_PROCESSES) as pool:
 
-    with mp.Pool(NUM_PROCESSES) as pool:
+        process = {}
 
         for item in item_list:
 
-            pool.apply_async(func,args=(item,res))
+            pool.apply_async(func,args=(item,))
 
         pool.close()
         pool.join()
 
-    result = {}
+    # for i in process:
 
-    while not res.empty():
+    #     process[i] = (process[i]).get()
 
-        item = res.get()
-
-        result[item[0]] = item[1]
-
-    return result
+    return process
