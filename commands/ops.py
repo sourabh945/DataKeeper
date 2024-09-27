@@ -172,7 +172,7 @@ def local_ls(path:str,folder_id:str,parent_id:str,_remote_folders:dict = {},_rem
 
                     index , cn ,cnf, cm , tf , tff = _indexer(path,"")
 
-                    count_new_files += cn
+                    count_new_folders += cn
                     count_new_files += cnf
                     count_modified_files += cm
                     total_files += tf
