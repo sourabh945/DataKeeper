@@ -68,7 +68,9 @@ def upload(tree:dict,upload_files:list):
 
 if __name__ == '__main__':
 
-    print("[Indexing] Both sources... ")
+    print(f'Path of backup forlder is {folder_path}')
+
+    print("\n[Indexing] Both sources... ")
 
     ROOT_ID = remote.root_id()
 
@@ -116,7 +118,7 @@ if __name__ == '__main__':
     print(f"Total number of folder in remote: {remote_folders_count}")
     print(f"Total number of files in remote: {remote_files_count}")
 
-    print('-------------------------------------------------------------------\n')
+    print('\n-------------------------------------------------------------------\n')
 
     print(f"Total number of new folders: {count_new_folders}")
     print(f"Total number of new files: {count_new_files}")
