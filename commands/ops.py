@@ -5,6 +5,14 @@ from .__helpers__.time import get_modtime
 from .__helpers__.trying import get_size
 
 
+def lister(item) -> list:
+
+    if 'list' in str(type(item)):
+        return item 
+    else:
+        return [item]
+
+
 
 
 def remote_list_2_dict(remote_list:list[dict]) -> dict[dict]:
@@ -68,11 +76,11 @@ def remote_ls(remote_dict:dict,folder_id:str,path_string:str='./') -> list[dict]
 
                 if files:
 
-                    res[path]['id'] = [res[path]['id']] + [item['id']]
-                    res[path]['version'] = [res[path]['version']] + list(item.get('properties',{}).get('version',[1]))
-                    res[path]['size'] = [res[path]['size']] + [item['size']]
-                    res[path]['modtime'] = [res[path]['modtime']] + [item['modifiedTime']]
-                    res[path]['other_version'][item['id']] = item.get('properties',{}).get('version',[1])
+                    res[path]['id'] = lister(res[path]['id']) + [item['id']]
+                    res[path]['version'] = lister(res[path]['version']) + lister(item.get('properties',{}).get('version',[1]))
+                    res[path]['size'] = lister(res[path]['size']) + lister(item['size'])
+                    res[path]['modtime'] = lister(res[path]['modtime']) + lister(item['modifiedTime'])
+                    res[path]['other_version'][item['id']] = item.get('properties',{}).get('version',1)
                 
                 else:
 
@@ -80,7 +88,7 @@ def remote_ls(remote_dict:dict,folder_id:str,path_string:str='./') -> list[dict]
                         'path':path,
                         'id':[item['id']],
                         'isdir':False,
-                        'parents':[parent_id],
+                        'parents':lister(parent_id),
                         'version':item.get('properties',{}).get('version',[1]),
                         'other_version':item.get('properties',{}).get('other_version',{item['id']:item.get('properties',{}).get('version',1)}),
                         'size':[item['size']],
@@ -192,7 +200,7 @@ def local_ls(path:str,folder_id:str,parent_id:str,_remote_folders:dict = {},_rem
 
                     size, modtime  = get_size(path) , get_modtime(path)
 
-                    if size in info['size'] and modtime in info['modtime']:
+                    if str(size) in lister(info['size']) and modtime in lister(info['modtime']):
 
                         pass
 
@@ -205,7 +213,7 @@ def local_ls(path:str,folder_id:str,parent_id:str,_remote_folders:dict = {},_rem
                             'id':"",
                             'isdir':False,
                             'parents':[folder_id],
-                            'version':int(info['version'][0]) + 1,
+                            'version':int(info['version'][-1]) + 1,
                             'other_version':info['other_version'],
                             'size':size,
                             'modtime':modtime,

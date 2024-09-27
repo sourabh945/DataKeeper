@@ -101,6 +101,8 @@ if __name__ == '__main__':
 
     remote_folders , remote_files = remote_ls(lists,backup_folder_id,folder_path)
 
+    remote_folders_count , remote_files_count = len(remote_folders) , len(remote_files)
+
     ################################################33
 
     import json
@@ -123,8 +125,8 @@ if __name__ == '__main__':
     print(f"Total number of folder in local: {total_folders}")
     print(f"Total number of files in local: {total_files}")
 
-    print(f"Total number of folder in remote: {len(remote_folders)}")
-    print(f"Total number of files in remote: {len(remote_files)}")
+    print(f"Total number of folder in remote: {remote_folders_count}")
+    print(f"Total number of files in remote: {remote_files_count}")
 
     print('-------------------------------------------------------------------\n')
 
