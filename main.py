@@ -44,8 +44,6 @@ def donwloads(folders:dict,files:dict):
 
 
 def upload(tree:dict,upload_files:list):
-   
-    fails = []
 
     print('\n[Creating] Folders...')
 
@@ -58,15 +56,13 @@ def upload(tree:dict,upload_files:list):
        
        if not item['parents'] :
            
-            item['parents'] = [ids.get(item['path'],[])]
+            item['parents'] = [ids.get(os.path.dirname(item['path']),"")]
 
     print('\n[Uploading] files...')
 
-    results = run(remote.functions._upload_file,upload_files)
+    run(remote.functions._upload_file,upload_files)
 
     print('\n[Done] uploading files')
-
-    return results, fails
 
 
 
@@ -77,6 +73,7 @@ if __name__ == '__main__':
     ROOT_ID = remote.root_id()
 
     lists = remote.ls()
+
 
     lists = remote_list_2_dict(lists)
 
@@ -103,15 +100,6 @@ if __name__ == '__main__':
 
     remote_folders_count , remote_files_count = len(remote_folders) , len(remote_files)
 
-    ################################################33
-
-    import json
-
-    with open(tree_path,'w') as files:
-
-        json.dump({**remote_folders,**remote_files},files)
-
-    ##################################################3
 
     print('[Done] Indexing')
     print('[Comparing] Both sources...')
@@ -164,16 +152,7 @@ if __name__ == '__main__':
 
     if option == 1 and sum([count_modified_files,count_new_files]) > 0 :
 
-        # print(upload_files)
-
-        result , fail = upload(local_,upload_files)
-
-        for i in result:
-
-            if result[i]:
-                fail.append(i)
-
-        print(f'No. of fails:{len(fail)}')
+        upload(local_,upload_files)
 
 
     elif option == 2 and len(deleted_folders)+len(deleted_files) > 0:

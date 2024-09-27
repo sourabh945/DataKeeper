@@ -29,7 +29,7 @@ class remote:
         page_token = None
 
         while True:
-            request = requests.ls(q='trashed=false',spaces='drive',pageToken=page_token, fields='nextPageToken, files(id,parents,drive_id,name,modifiedTime,size,mimeType,properties)')
+            request = requests.ls(q='trashed=false',spaces='drive',pageSize=40,pageToken=page_token, fields='nextPageToken, files(id,parents,drive_id,name,modifiedTime,size,mimeType,properties)')
 
             page_token = request.get('nextPageToken',None)
 
@@ -247,7 +247,7 @@ class remote:
 
             metadata = {
                 'name': os.path.basename(item['path']),
-                'parents':list(item['parents']),
+                'parents':item['parents'],
                 'properties': {
                     'version':item['version'],
                     'other_version':item['other_version']
